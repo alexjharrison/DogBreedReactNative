@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, Slider } from 'react-native'
 import questions from '../assets/questions'
-import ResultModal from './ResultModal';
 
 const CustomSlider = props => (
     <View style={styles.container}> 

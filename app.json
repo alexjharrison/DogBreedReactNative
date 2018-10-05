@@ -22,6 +22,11 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android":{
+      "package":"com.alexjhar.dogs",
+      "versionCode":1 , 
+      "icon":"./dog.png"
     }
   }
 }

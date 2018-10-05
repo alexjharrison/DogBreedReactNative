@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, Image, Button } from 'react-native';
+import { ScrollView, StyleSheet, Text, Image, Button } from 'react-native';
 import Slider from "./components/CustomSlider";
 import ResultModal from "./components/ResultModal";
+import breeds from "./assets/breeds";
 
 export default class App extends React.Component {
   state = {
@@ -9,6 +10,7 @@ export default class App extends React.Component {
     modalVisible: false,
     bestBreed: "",
     breedImage: "",
+    percentMatch: 0
   }
 
   changeValue = (newValue, index) => {
@@ -18,25 +20,60 @@ export default class App extends React.Component {
     console.log(newValue);
   }
 
-  showModal = () => {
-    this.setState({modalVisible:true})
+  calcMatch = () => {
+    let scoreList = breeds.map(breed => {
+      const breedTraits = [
+        breed.size,
+        breed.kidFriendly,
+        breed.dogFriendly,
+        breed.lowShedding,
+        breed.easyToGroom,
+        breed.highEnergy,
+        breed.goodHealth,
+        breed.lowBarking,
+        breed.intelligence,
+        breed.easyToTrain,
+        breed.toleratesHot,
+        breed.toleratesCold
+      ];
+      const possibleDiff = 12 * 4;
+      let actualDiff = this.state.answers.reduce((total, amount, index) => {
+        return total + Math.abs(amount - breedTraits[index]);
+      }, 0)
+      const percentMatch = (100 - (actualDiff / possibleDiff * 100)).toFixed(2);
+      return percentMatch
+    });
+
+    let topIndex;
+    scoreList.forEach((score,index)=>{
+      if (score==Math.max(...scoreList)) topIndex = index;
+    })
+    const topScore = scoreList[topIndex];
+    const topBreed = breeds[topIndex].name;
+    const picture = `http://www.dogbreedchart.com/img/${breeds[topIndex].id}.jpg`;
+
+
+    this.setState({
+      modalVisible: true,
+      bestBreed: topBreed,
+      breedImage: picture,
+      percentMatch: topScore
+    })
   }
 
   hideModal = () => {
-    this.setState({modalVisible:false})
-  }
-
-  calcMatch = () => {
-
+    this.setState({ modalVisible: false })
   }
 
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <ResultModal 
-          hideModal={this.hideModal} 
-          visible={this.state.modalVisible} 
-          bestBreed={this.state.bestBreed}    
+        <ResultModal
+          hideModal={this.hideModal}
+          visible={this.state.modalVisible}
+          bestBreed={this.state.bestBreed}
+          breedImage={this.state.breedImage}
+          percentMatch={this.state.percentMatch}
         />
         <Image style={styles.image} source={require('./assets/mabel.jpg')} />
         <Text style={styles.text}>Breed Questionnaire</Text>
@@ -44,7 +81,7 @@ export default class App extends React.Component {
         {this.state.answers.map((value, i) => (
           <Slider index={i} key={i} value={value} changeValue={this.changeValue} />
         ))}
-        <Button title="View Results" onPress={() => { this.showModal() }} />
+        <Button title="View Results" onPress={() => { this.calcMatch() }} />
       </ScrollView>
     );
   }
