@@ -1,32 +1,50 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View, Image, Button } from 'react-native';
 import Slider from "./components/CustomSlider";
+import ResultModal from "./components/ResultModal";
 
 export default class App extends React.Component {
   state = {
-    answers: [1,1,1,1,1,1,1,1,1,1,1,1],
+    answers: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    modalVisible: false,
+    bestBreed: "",
+    breedImage: "",
   }
 
-  changeValue = (newValue,index) => {
+  changeValue = (newValue, index) => {
     let answers = this.state.answers;
     answers[index] = newValue;
-    this.setState({answers});
+    this.setState({ answers });
     console.log(newValue);
+  }
+
+  showModal = () => {
+    this.setState({modalVisible:true})
+  }
+
+  hideModal = () => {
+    this.setState({modalVisible:false})
+  }
+
+  calcMatch = () => {
+
   }
 
   render() {
     return (
-      <ScrollView  contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <ResultModal 
+          hideModal={this.hideModal} 
+          visible={this.state.modalVisible} 
+          bestBreed={this.state.bestBreed}    
+        />
         <Image style={styles.image} source={require('./assets/mabel.jpg')} />
         <Text style={styles.text}>Breed Questionnaire</Text>
-        
-        {this.state.answers.map((value,i)=>(
+
+        {this.state.answers.map((value, i) => (
           <Slider index={i} key={i} value={value} changeValue={this.changeValue} />
         ))}
-        <Button title="View Results" onPress={()=>{
-          alert("i'm an alert");
-          console.log("i'm alerted");
-        }} />
+        <Button title="View Results" onPress={() => { this.showModal() }} />
       </ScrollView>
     );
   }
@@ -37,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     marginTop: 40,
-    paddingBottom:340
+    paddingBottom: 340
   },
   image: {
     height: "20%",
